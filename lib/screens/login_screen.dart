@@ -10,6 +10,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscureText = true; // Variable para controlar la visibilidad de la contraseña
+ //CREAR EL CEREBRO 
+  StateMachineController? _controller;
+  
+  //SMIT : STATE MACHINE INPUT
+  SMIBool? _isChecking;
+  SMIBool? _isHandsUp;
+  SMITrigger? _trigSuccess;
+  SMITrigger? _trigfail;
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery .of(context).size;
@@ -24,24 +33,66 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: size.width,
                 height: 200, // Ajustar el tamaño del RiveAnimation
-                child: RiveAnimation.asset('assets/3645-7621-remix-of-login-machine.riv'),
+                child: RiveAnimation.asset('assets/3645-7621-remix-of-login-machine.riv', stateMachines: ['Login Machine'],
+                //Iniciar animacion
+                onInit: (artboard){
+
+                  _controller = StateMachineController.fromArtboard(
+                    artboard, 
+                    'Login Machine');
+
+                    //verifica que inicio bien
+                    if (_controller == null) return;
+                    //agrega el controlador al tablero/escenario
+                    artboard.addController(_controller!);
+                    //vincular variables 
+                    _isChecking = _controller!.findSMI('isChecking');
+                    _isHandsUp = _controller!.findSMI('isHandsUp');
+                    _trigSuccess = _controller!.findSMI('istrigSuccess');
+                    _trigfail = _controller!.findSMI('trigfail'); 
+
+                },
+
+                
+                ),
               ),
               //para separacion 
               const SizedBox(height: 10),
+              //campo de texto email 
               TextField(
-                //un tipo de teclado para email
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Email',
-                  prefixIcon: const Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    //para redondear los bordes 
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
+
+
+        onChanged: (value) {
+          if (_isHandsUp != null) {
+            _isHandsUp!.change(false);
+          }
+          if (_isChecking == null) return;
+          _isChecking!.change(true);
+
+
+        }, // <--- AQUÍ cierras la función del onChanged
+        keyboardType: TextInputType.emailAddress, // <--- AHORA sí es una propiedad válida
+        decoration: InputDecoration(
+          hintText: 'Email',
+          prefixIcon: const Icon(Icons.email),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
               const SizedBox(height: 10),
               TextField(
+                   onChanged: (value) {
+                     //si ischecking no es nulo
+                    if (_isChecking != null) { 
+                  //activar el modo chismoso
+                      _isChecking!.change(false);}
+                  //no tapes los ojos al ver email 
+                      if (_isHandsUp == null) return;
+                      _isHandsUp!.change(true);
+                  
+                },
+              
                 obscureText: _obscureText,
                 decoration: InputDecoration(
                   hintText: 'Password',
