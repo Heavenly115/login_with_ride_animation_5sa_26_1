@@ -45,14 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // 1.4) Liberar los FocusNode para evitar fugas de memoria
-  @override
-  void dispose() {
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _controller?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +121,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+    }
+    
+    // 1.4) Liberar los FocusNode para evitar fugas de memoria
     @override
     void dispose() {
       _emailFocusNode.dispose();
       _passwordFocusNode.dispose();
       _controller?.dispose();
       super.dispose();
-    }
   }
 }
