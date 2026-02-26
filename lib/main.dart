@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:login_with_ride_animation_5sa_26_1/screens/login_screen.dart';
 
 void main() {
+  
   runApp(const MyApp());
 }
 

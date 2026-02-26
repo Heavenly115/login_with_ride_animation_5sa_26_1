@@ -1,50 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+import 'dart:async'; 
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
-  
-  // Rive Controller y SMIs
+
+  // Controlador y Entradas (Inputs) de Rive
   StateMachineController? _controller;
   SMIBool? _isChecking;
   SMIBool? _isHandsUp;
   SMITrigger? _trigSuccess;
-  SMITrigger? _trigfail;
+  SMITrigger? _trigFail;
+  SMINumber? _numLook; 
 
-  // 1) Variables para FocusNode
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+  // Nodos de enfoque para detectar dónde hace clic el usuario
+  final _emailFocusNode = FocusNode();
+  final _passowrdFocusNode = FocusNode();
+
+  Timer? _typingDebounce;
 
   @override
   void initState() {
     super.initState();
-
-    // 2) Listeners para reaccionar al foco
+    
+    // Escuchar cuando el usuario entra al campo de Email
     _emailFocusNode.addListener(() {
       if (_emailFocusNode.hasFocus) {
-        _isChecking?.change(true);  // Mira el texto si entro al email
-        _isHandsUp?.change(false);  // Baja las manos si estaban arriba
-      } else {
-        _isChecking?.change(false); // Deja de mirar si salgo del email
+        _isHandsUp?.change(false); // Baja las manos
+        _numLook?.value = 50.0;    // Centra la mirada
       }
     });
 
-    _passwordFocusNode.addListener(() {
-      if (_passwordFocusNode.hasFocus) {
-        _isHandsUp?.change(true);   // Se tapa los ojos al entrar a password
-        _isChecking?.change(false); // Deja de mirar el email
-      } else {
-        _isHandsUp?.change(false);  // Se destapa los ojos al salir
-      }
+    // Escuchar cuando el usuario entra al campo de Password
+    _passowrdFocusNode.addListener(() {
+      // Sube las manos si tiene el foco, las baja si no
+      _isHandsUp?.change(_passowrdFocusNode.hasFocus);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -58,77 +57,91 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               SizedBox(
                 width: size.width,
-                height: 200,
+                height: 250, // Un poco más de espacio para el oso
                 child: RiveAnimation.asset(
-                  'assets/3645-7621-remix-of-login-machine.riv',
+                  'assets/3645-7621-remix-of-login-machine.riv', 
                   stateMachines: const ['Login Machine'],
                   onInit: (artboard) {
-                    _controller = StateMachineController.fromArtboard(artboard, 'Login Machine');
-                    if (_controller == null) return;
-                    artboard.addController(_controller!);
+                    final controller = StateMachineController.fromArtboard(
+                      artboard, 
+                      'Login Machine'  
+                    );
 
-                    _isChecking = _controller!.findSMI('isChecking');
-                    _isHandsUp = _controller!.findSMI('isHandsUp');
-                    _trigSuccess = _controller!.findSMI('istrigSuccess');
-                    _trigfail = _controller!.findSMI('trigfail');
+                    if (controller != null) {
+                      artboard.addController(controller);
+                      _controller = controller;
+                      
+                      // Vinculación segura de los inputs
+                      _isChecking = controller.findSMI<SMIBool>('isChecking');
+                      _isHandsUp = controller.findSMI<SMIBool>('isHandsUp');
+                      _trigSuccess = controller.findSMI<SMITrigger>('trigSuccess');
+                      _trigFail = controller.findSMI<SMITrigger>('trigFail');
+                      _numLook = controller.findSMI<SMINumber>('numLook');
+                    }
                   },
                 ),
               ),
-              const SizedBox(height: 10),
-              
-              // Campo de Email
+
+              const SizedBox(height: 18),
+
+              // CAMPO EMAIL
               TextField(
-                focusNode: _emailFocusNode, // 1.3) Asignar FocusNode
+                focusNode: _emailFocusNode,
+                onChanged: (value) {
+                  // Activa la mirada del oso hacia el texto
+                  _isChecking?.change(true);
+
+                  // Calcula la posición de los ojos (0 a 100)
+                  final lookValue = (value.length / 80.0 * 100.0).clamp(0.0, 100.0);
+                  _numLook?.value = lookValue;
+
+                  // Si deja de escribir por 2 segundos, el oso deja de mirar fijamente
+                  _typingDebounce?.cancel();
+                  _typingDebounce = Timer(const Duration(seconds: 2), () {
+                    if (!mounted) return;
+                    _isChecking?.change(false); 
+                  });
+                },
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Email',
                   prefixIcon: const Icon(Icons.email),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-              const SizedBox(height: 10),
 
-              // Campo de Password
+              const SizedBox(height: 15),
+
+              // CAMPO PASSWORD
               TextField(
-                focusNode: _passwordFocusNode, // Asignar FocusNode
+                focusNode: _passowrdFocusNode,
+                onChanged: (value) {
+                  // Mantiene las manos arriba mientras escribe la clave
+                  _isHandsUp?.change(true);
+                },
                 obscureText: _obscureText,
                 decoration: InputDecoration(
                   hintText: 'Password',
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
+                    onPressed: () => setState(() => _obscureText = !_obscureText),
                   ),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              // Botón de ejemplo para disparar éxito/error
-              ElevatedButton(
-                onPressed: () {
-                  // Aquí podrías disparar los triggers
-                  _trigSuccess?.fire(); 
-                },
-                child: const Text('Iniciar Sesión'),
               ),
             ],
           ),
         ),
       ),
     );
-    }
-    
-    // 1.4) Liberar los FocusNode para evitar fugas de memoria
-    @override
-    void dispose() {
-      _emailFocusNode.dispose();
-      _passwordFocusNode.dispose();
-      _controller?.dispose();
-      super.dispose();
+  }
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    _passowrdFocusNode.dispose();
+    _typingDebounce?.cancel(); 
+    super.dispose();
   }
 }

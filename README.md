@@ -1,16 +1,58 @@
-# login_with_ride_animation_5sa_26_1
+# 🐻 Rive Animated Login Screen
 
-A new Flutter project.
+This is an interactive login interface built with **Flutter** and **Rive**. The character reacts in real-time to user input using a State Machine to enhance the user experience. 🚀
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📖 Functional Description
+* **Interactive Focus**: The character follows the text as you type the email.
+* **Privacy Mode**: The character covers its eyes when the password field is focused.
+* **Feedback Triggers**: Includes specific animations for successful login and failed attempts.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🎨 What are Rive and State Machine?
+* **Rive**: A real-time interactive design and animation tool that allows for high-quality, code-driven vector graphics.
+* **State Machine**: A visual logic layer that manages transitions between animations based on specific inputs (Booleans or Triggers) from the Flutter code.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🛠️ Technologies
+* **Framework**: Flutter 🐦
+* **Animation**: Rive 🎨
+* **Language**: Dart 🎯
+
+---
+
+## 📂 Project Structure
+The core logic is managed within the `lib` directory:
+
+| File / Folder | Description |
+| :--- | :--- |
+| `main.dart` | App entry point & Theme configuration. |
+| `screens/` | Folder containing the UI layouts. |
+| `login_screen.dart` | UI logic & Rive State Machine integration. |
+
+---
+
+## 🎬 Demo
+![Project Demo](assets_demo.gif)  ![assets_demo](https://github.com/user-attachments/assets/7bac46e0-2c07-4877-ac70-db875c17ec79)
+
+
+---
+
+## 🎓 Academic Information
+* **Subject**: [Graficación]
+* **Professor**: [Rodrigo Fidel Gaxiola Sosa]
+
+---
+
+## ❤️ Credits
+* **Animation**: "Remix of Login Machine"
+* **Author/Source**: [Rive Community - Login Bear](https://rive.app/community/7621-remix-of-login-machine/)
+
+---
+
+### **How to Run**
+1. Run `flutter pub get` to install dependencies.
+2. Launch the app using `flutter run`.
