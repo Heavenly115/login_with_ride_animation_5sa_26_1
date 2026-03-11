@@ -36,7 +36,8 @@ The core logic is managed within the `lib` directory:
 ---
 
 ## 🎬 Demo
-![Project Demo](assets_demo.gif)  ![assets_demo](https://github.com/user-attachments/assets/7bac46e0-2c07-4877-ac70-db875c17ec79)
+![Project Demo](![Flutter-Demo-y-4-páginas-más-Personal_-Microsoft_-Edge-2026-03-11-14-20-53](https://github.com/user-attachments/assets/6a4060b4-da46-422f-aa5b-cbe879acce79)
+)  ![assets_demo](https://github.com/user-attachments/assets/7bac46e0-2c07-4877-ac70-db875c17ec79)
 
 
 ---
